@@ -208,14 +208,6 @@ var Game = {
 
         return false;
     },
-    _isKey(keys, key) {
-        // Whether this key is in a list of keys
-        return keys.indexOf(key) > -1;
-    },
-    _isNoteName(noteNames, noteName) {
-        // Whether this note name is in a list of note names
-        return noteNames.indexOf(noteNames) > -1;
-    },
     onMidiMessage: function(midiMessageEvent) {
         data = midiMessageEvent.data;
         const msg = data[0];
@@ -402,7 +394,17 @@ var MidiKernel = {
         );
     },
     makeMidiSelector: function(options) {
+        const d = document.createElement('div');
+
+        const l = document.createElement('label');
+        l.setAttribute('for', 'select_midi_input');
+        l.appendChild(document.createTextNode('Select MIDI Input:'));
+        d.appendChild(l);
+        d.appendChild(document.createElement('br'));
+
         const s = document.createElement('select');
+        s.setAttribute('id', 'select_midi_input');
+
         for (i in options) {
             var o = document.createElement('option');
             o.setAttribute("value", options[i].id);
@@ -410,7 +412,9 @@ var MidiKernel = {
             s.appendChild(o);
         }
 
-        document.getElementById('midi_select').appendChild(s);
+        d.appendChild(s);
+
+        document.getElementById('midi_select').appendChild(d);
 
         // When user selects an input, bind the onmidimessage to that one
         s.addEventListener('input', function (event) {
