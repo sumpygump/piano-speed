@@ -126,53 +126,17 @@ var Game = {
     penalties: 0, // Current penalties
     active: null, // The active note being quizzed
     listening: false, // Whether midi input should be analyzed
-    arena: null, // Arena dom element
-    pointsElem: null, // Points dom element
-    penaltiesElem: null, // Penalties dom element
-    levelElem: null, // Dom element showing level information
-    staveElem: null, // Stave element - where the notes are rendered
-    noteDisplayElem: null, // Place to show the note you just played
-    resultElem: null, // Dom element for showing whether wrong or right
 
     init: function() {
-        this.arena = document.getElementById("game");
-
-        const pointBox = document.createElement('div');
-        pointBox.classList.add('point-box');
-
-        this.pointsElem = this.makeElement('div', 'points', this.points);
-        pointBox.appendChild(this.pointsElem);
-
-        this.penaltiesElem = this.makeElement('div', 'penalties', this.penalties);
-        pointBox.appendChild(this.penaltiesElem);
-
-        this.arena.appendChild(pointBox);
-
-        this.levelElem = this.makeElement('div', 'level', ' ');
-        this.arena.appendChild(this.levelElem);
-
-        this.staveElem = this.makeElement('div', 'stave', ' ');
-        this.arena.appendChild(this.staveElem);
-
-        this.noteDisplayElem = this.makeElement('div', 'note_name', ' ');
-        this.arena.appendChild(this.noteDisplayElem);
-
-        this.resultElem = this.makeElement('div', 'result', ' ');
-        this.arena.appendChild(this.resultElem);
-
+        this.ui = GameUI;
+        this.ui.init();
         this.startLevel();
-    },
-    makeElement: function(elementName, id, content) {
-        const elem = document.createElement(elementName);
-        elem.setAttribute('id', id);
-        elem.innerHTML = content;
-        return elem;
     },
     startLevel: function() {
         this.level = Levels[this.levelIndex];
-        this.putMessage('');
         this.makeLevel(this.level);
-        this.levelElem.innerHTML = this.level.name;
+        this.ui.putMessage('');
+        this.ui.showLevel(this.level.name);
         this.prompt();
     },
     makeLevel: function(level) {
@@ -195,8 +159,8 @@ var Game = {
         });
     },
     prompt: function() {
-        this.putMessage('&nbsp;');
-        this.clearNoteName();
+        this.ui.putMessage('&nbsp;');
+        this.ui.clearNoteName();
         MusicCanvas.clear().init(this.level.clef, this.level.key);
 
         // Pick a random note to quiz
@@ -286,7 +250,7 @@ var Game = {
         const noteNumber = data[1];
 
         if (msg == MidiMessage.KEYOFF) {
-            MidiKernel.midiMessageOff();
+            this.ui.midiMessageOff();
         }
 
         if (this.listening == false) {
@@ -294,7 +258,7 @@ var Game = {
         }
 
         if (msg == MidiMessage.KEYON) {
-            MidiKernel.midiMessageOn();
+            this.ui.midiMessageOn();
             if (noteNumber == this.active.note_number) {
                 this.isCorrect();
             } else {
@@ -304,9 +268,9 @@ var Game = {
     },
     isCorrect: function() {
         this.listening = false;
-        this.displayNoteName(this.active);
-        document.querySelector('.board').classList.remove('board_error');
-        this.putMessage('Correct!', 'success');
+        this.ui.displayNoteName(this.active);
+        this.ui.clearBoardError();
+        this.ui.putMessage('Correct!', 'success');
         MusicCanvas.group.classList.add('correct');
         this.addPoint();
 
@@ -317,40 +281,106 @@ var Game = {
         }
     },
     isIncorrect: function() {
-        this.putMessage('Try again!', 'error');
+        this.ui.putMessage('Try again!', 'error');
+        this.ui.setBoardError();
         this.addPenalty();
-        document.querySelector('.board').classList.add('board_error');
+    },
+    addPoint: function() {
+        this.points++;
+        this.ui.showPoints(this.points);
+    },
+    addPenalty: function() {
+        this.penalties++;
+        this.ui.showPenalties(this.penalties);
+    },
+    advanceLevel: function() {
+        MusicCanvas.clear();
+        this.ui.clearNoteName();
+        this.ui.putMessage('Great job!');
+        setTimeout(function() {
+            this.levelIndex++;
+            this.startLevel();
+        }.bind(this), 2000);
+    }
+}
+
+var GameUI = {
+    arena: null, // Arena dom element
+    pointsElem: null, // Points dom element
+    penaltiesElem: null, // Penalties dom element
+    levelElem: null, // Dom element showing level information
+    staveElem: null, // Stave element - where the notes are rendered
+    noteDisplayElem: null, // Place to show the note you just played
+    resultElem: null, // Dom element for showing whether wrong or right
+
+    init: function() {
+        this.arena = document.getElementById("game");
+
+        this.levelElem = this.makeElement('div', 'level', ' ');
+        this.arena.appendChild(this.levelElem);
+
+        const pointBox = document.createElement('div');
+        pointBox.classList.add('point-box');
+
+        this.pointsElem = this.makeElement('div', 'points', 0);
+        pointBox.appendChild(this.pointsElem);
+
+        this.penaltiesElem = this.makeElement('div', 'penalties', 0);
+        pointBox.appendChild(this.penaltiesElem);
+
+        this.arena.appendChild(pointBox);
+
+        this.staveElem = this.makeElement('div', 'stave', ' ');
+        this.arena.appendChild(this.staveElem);
+
+        this.noteDisplayElem = this.makeElement('div', 'note_name', ' ');
+        this.arena.appendChild(this.noteDisplayElem);
+
+        this.resultElem = this.makeElement('div', 'result', ' ');
+        this.arena.appendChild(this.resultElem);
+    },
+    makeElement: function(elementName, id, content) {
+        const elem = document.createElement(elementName);
+        elem.setAttribute('id', id);
+        elem.innerHTML = content;
+        return elem;
+    },
+    putMessage: function(message, class_) {
+        this.resultElem.classList.remove('success');
+        this.resultElem.classList.remove('error');
+        if (class_) {
+            this.resultElem.classList.add(class_);
+        }
+        this.resultElem.innerHTML = message;
+    },
+    showLevel: function(name) {
+        this.levelElem.innerHTML = name;
+    },
+    clearNoteName: function() {
+        this.noteDisplayElem.innerHTML = '&nbsp;';
+    },
+    showPoints: function(points) {
+        this.pointsElem.innerHTML = points;
+    },
+    showPenalties: function(penalties) {
+        this.penaltiesElem.innerHTML = penalties;
     },
     displayNoteName: function(active) {
         noteName = active.pos[0];
         acc = active.pos[1].replace('#', '&#9839;').replace('n', '&#9838;').replace('b', '&#9837;');
         this.noteDisplayElem.innerHTML = noteName + acc;
     },
-    clearNoteName: function() {
-        this.noteDisplayElem.innerHTML = '&nbsp;';
+    setBoardError: function() {
+        document.querySelector('.board').classList.add('board_error');
     },
-    putMessage: function(message, class_) {
-        this.resultElem.classList.remove('success');
-        this.resultElem.classList.remove('error');
-        this.resultElem.classList.add(class_);
-        this.resultElem.innerHTML = message;
+    clearBoardError: function() {
+        document.querySelector('.board').classList.remove('board_error');
     },
-    addPoint: function() {
-        this.points++;
-        this.pointsElem.innerHTML = this.points;
+    midiMessageOn: function() {
+        document.getElementById("midi_mon").classList.add("active");
     },
-    addPenalty: function() {
-        this.penalties++;
-        this.penaltiesElem.innerHTML = this.penalties;
-    },
-    advanceLevel: function() {
-        MusicCanvas.clear();
-        this.clearNoteName();
-        this.putMessage('Great job!');
-        setTimeout(function() {
-            this.levelIndex++;
-            this.startLevel();
-        }.bind(this), 2000);
+    midiMessageOff: function() {
+        document.getElementById("midi_mon").classList.remove("active");
     }
 }
 
@@ -366,7 +396,7 @@ var MidiKernel = {
         if (navigator.requestMIDIAccess) {
             navigator.requestMIDIAccess({
                 sysex: true
-            }).then(MidiKernel.onMIDISuccess.bind(MidiKernel), MidiKernel.onMIDIFailure);
+            }).then(MidiKernel.onMIDISuccess.bind(MidiKernel), MidiKernel.onMIDIFailure.bind(MidiKernel));
         } else {
             console.warn("No MIDI support in your browser");
         }
@@ -379,18 +409,25 @@ var MidiKernel = {
         var allInputs = this.midi.inputs.values();
         var options = [];
 
-        // Loop over all available inputs and listen for any MIDI input
+        // Loop over all available inputs and add to list of options
         for (var input = allInputs.next(); input && !input.done; input = allInputs.next()) {
             options.push({id: input.value.id, name: (input.value.manufacturer + " " + input.value.name).trim()});
         }
 
-        this.makeMidiSelector.bind(this)(options);
-        this.setMidiInputDevice(options[0].id);
+        if (options.length > 0) {
+            this.makeMidiSelector.bind(this)(options);
+            this.setMidiInputDevice(options[0].id);
+        } else {
+            this.setMidiErrorMessage("No MIDI devices detected. Connect MIDI device and refresh.");
+        }
     },
     onMIDIFailure: function() {
         console.warn("Not recognising MIDI controller");
+        this.setMidiErrorMessage("Midi error: Cannot connect");
+    },
+    setMidiErrorMessage: function(message) {
         document.getElementById('midi_error').appendChild(
-            document.createTextNode("Midi error: Cannot connect")
+            document.createTextNode(message)
         );
     },
     makeMidiSelector: function(options) {
@@ -422,12 +459,6 @@ var MidiKernel = {
                 input.value.onmidimessage = null;
             }
         }
-    },
-    midiMessageOn: function() {
-        document.getElementById("midi_mon").classList.add("active");
-    },
-    midiMessageOff: function() {
-        document.getElementById("midi_mon").classList.remove("active");
     }
 }
 

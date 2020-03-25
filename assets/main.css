@@ -42,7 +42,7 @@ p {
     align-items: center;
 }
 .midi-device {
-    font-size: 30px;
+    font-size: 20px;
     vertical-align: middle;
     padding-right: 10px;
 }
@@ -72,17 +72,29 @@ p {
 
 .point-box {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
 }
 #points {
-    color: #00cc00;
+    background-color: rgba(26, 162, 26, 0.4);
+    color: #ffffff;
+    padding: 4px 10px;
+    box-sizing: border-box;
+    text-align: center;
+    width: 100px;
 }
 #penalties {
-    color: #cc0000;
+    background-color: rgba(204, 0, 0, 0.4);
+    color: #ffffff;
+    padding: 4px 10px;
+    box-sizing: border-box;
+    text-align: center;
+    width: 100px;
 }
 
 #level {
     text-align: center;
+    padding: 10px;
+    font-size: 20px;
 }
 
 .success {
