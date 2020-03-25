@@ -3,6 +3,10 @@ window.onload = function(e) {
     MidiKernel.init(Game.onMidiMessage, Game);
 };
 
+String.prototype.isOneOf = function(items) {
+    return items.indexOf(this.toString()) > -1;
+};
+
 const Keydefs = {
     // is = sharp, es = flat
     ces: ["Gb"],
@@ -25,6 +29,21 @@ const Keydefs = {
     bes: ["F", "Bb", "Eb", "Ab", "Db", "Gb"],
     b: ["C", "G", "D", "A", "E", "B", "F#"],
 };
+
+const KeyAccMap = [
+    { keys: ['F', 'Dm'], notes: ['b'] },
+    { keys: ['G', 'Em'], notes: ['f'] },
+    { keys: ['Bb', 'Gm'], notes: ['b', 'e'] },
+    { keys: ['D', 'Bm'], notes: ['f', 'c'] },
+    { keys: ['Eb', 'Cm'], notes: ['b', 'e', 'a'] },
+    { keys: ['A', 'F#m'], notes: ['f', 'c', 'g'] },
+    { keys: ['Ab', 'Fm'], notes: ['b', 'e', 'a', 'd'] },
+    { keys: ['E', 'C#m'], notes: ['f', 'c', 'g', 'd'] },
+    { keys: ['Db', 'Bbm'], notes: ['b', 'e', 'a', 'd', 'g'] },
+    { keys: ['B', 'G#m'], notes: ['f', 'c', 'g', 'd', 'a'] },
+    { keys: ['Gb', 'Ebm'], notes: ['b', 'e', 'a', 'd', 'g', 'c'] },
+    { keys: ['F#', 'D#m'], notes: ['f', 'c', 'g', 'd', 'a', 'e'] },
+];
 
 const Notes = [
     {note_number: 45, pos: ['a', '', 2], keys: Keydefs.a, tags: ["l2"], clefs: ["bass"]},
@@ -108,8 +127,8 @@ const Levels = [
     {name: "Level 14", tags: ["l1", "l2", "medium", "hard"], key: "E", clef: "treble", accidentals: false},
     {name: "Level 15", tags: ["l1", "l2", "medium", "hard"], key: "Db", clef: "treble", accidentals: false},
     {name: "Level 16", tags: ["l1", "l2", "medium", "hard"], key: "B", clef: "treble", accidentals: false},
-    {name: "Level 17", tags: ["l1", "l2", "medium", "hard"], key: "Gb", clef: "treble", accidentals: false},
-    {name: "Level 18", tags: ["l1", "l2", "medium", "hard"], key: "F#", clef: "treble", accidentals: false},
+    {name: "Level 17", tags: ["l1", "l2", "medium", "hard"], key: "Gb", clef: "treble", accidentals: true},
+    {name: "Level 18", tags: ["l1", "l2", "medium", "hard"], key: "F#", clef: "treble", accidentals: true},
 ];
 
 const MidiMessage = {
@@ -181,68 +200,21 @@ var Game = {
             return false;
         }
 
-        if ((key == 'F' || key == 'Dm')
-            && (noteName == 'b')
-        ) {
-            return true;
-        }
-        if ((key == 'G' || key == 'Em')
-            && (noteName == 'f')
-        ) {
-            return true;
-        }
-        if ((key == 'Bb' || key == 'Gm')
-            && (noteName == 'b' || noteName == 'e')
-        ) {
-            return true;
-        }
-        if ((key == 'D' || key == 'Bm')
-            && (noteName == 'f' || noteName == 'c')
-        ) {
-            return true;
-        }
-        if ((key == 'Eb' || key == 'Cm')
-            && (noteName == 'b' || noteName == 'e' || noteName == 'a')
-        ) {
-            return true;
-        }
-        if ((key == 'A' || key == 'F#m')
-            && (noteName == 'f' || noteName == 'c' || noteName == 'g')
-        ) {
-            return true;
-        }
-        if ((key == 'Ab' || key == 'Fm')
-            && (noteName == 'b' || noteName == 'e' || noteName == 'a' || noteName == 'd')
-        ) {
-            return true;
-        }
-        if ((key == 'E' || key == 'C#m')
-            && (noteName == 'f' || noteName == 'c' || noteName == 'g' || noteName == 'd')
-        ) {
-            return true;
-        }
-        if ((key == 'Db' || key == 'Bbm')
-            && (noteName == 'b' || noteName == 'e' || noteName == 'a' || noteName == 'd' || noteName == 'g')
-        ) {
-            return true;
-        }
-        if ((key == 'B' || key == 'G#m')
-            && (noteName == 'f' || noteName == 'c' || noteName == 'g' || noteName == 'd' || noteName == 'a')
-        ) {
-            return true;
-        }
-        if ((key == 'Gb' || key == 'Ebm')
-            && (noteName == 'b' || noteName == 'e' || noteName == 'a' || noteName == 'd' || noteName == 'g' || noteName == 'c')
-        ) {
-            return true;
-        }
-        if ((key == 'F#' || key == 'D#m')
-            && (noteName == 'f' || noteName == 'c' || noteName == 'g' || noteName == 'd' || noteName == 'a' || noteName == 'e')
-        ) {
-            return true;
+        for (i in KeyAccMap) {
+            if (key.isOneOf(KeyAccMap[i].keys) && noteName.isOneOf(KeyAccMap[i].notes)) {
+                return true;
+            }
         }
 
         return false;
+    },
+    _isKey(keys, key) {
+        // Whether this key is in a list of keys
+        return keys.indexOf(key) > -1;
+    },
+    _isNoteName(noteNames, noteName) {
+        // Whether this note name is in a list of note names
+        return noteNames.indexOf(noteNames) > -1;
     },
     onMidiMessage: function(midiMessageEvent) {
         data = midiMessageEvent.data;
@@ -404,7 +376,6 @@ var MidiKernel = {
     onMIDISuccess: function(midiData) {
         // This is all our MIDI data
         this.midi = midiData;
-        console.log(this);
 
         var allInputs = this.midi.inputs.values();
         var options = [];
