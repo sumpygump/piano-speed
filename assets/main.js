@@ -281,15 +281,20 @@ var Game = {
         return false;
     },
     onMidiMessage: function(midiMessageEvent) {
-        if (this.listening == false) {
-            return;
-        }
-
         data = midiMessageEvent.data;
         const msg = data[0];
         const noteNumber = data[1];
 
+        if (msg == MidiMessage.KEYOFF) {
+            MidiKernel.midiMessageOff();
+        }
+
+        if (this.listening == false) {
+            return;
+        }
+
         if (msg == MidiMessage.KEYON) {
+            MidiKernel.midiMessageOn();
             if (noteNumber == this.active.note_number) {
                 this.isCorrect();
             } else {
@@ -360,8 +365,8 @@ var MidiKernel = {
         // Start talking to MIDI controller
         if (navigator.requestMIDIAccess) {
             navigator.requestMIDIAccess({
-                sysex: false
-            }).then(MidiKernel.onMIDISuccess, MidiKernel.onMIDIFailure);
+                sysex: true
+            }).then(MidiKernel.onMIDISuccess.bind(MidiKernel), MidiKernel.onMIDIFailure);
         } else {
             console.warn("No MIDI support in your browser");
         }
@@ -369,24 +374,60 @@ var MidiKernel = {
     onMIDISuccess: function(midiData) {
         // This is all our MIDI data
         this.midi = midiData;
+        console.log(this);
 
         var allInputs = this.midi.inputs.values();
+        var options = [];
 
         // Loop over all available inputs and listen for any MIDI input
         for (var input = allInputs.next(); input && !input.done; input = allInputs.next()) {
-            console.log(input);
-
-            const p = document.createElement('p');
-            p.innerHTML = "MIDI connected: " + input.value.manufacturer + " " + input.value.name;
-            document.getElementById('midi_info').appendChild(p);
-
-            // When a MIDI value is received call the onMIDIMessage function
-            input.value.onmidimessage = MidiKernel.onMidiMessageEvent.bind(MidiKernel.bindObject);
+            options.push({id: input.value.id, name: (input.value.manufacturer + " " + input.value.name).trim()});
         }
+
+        this.makeMidiSelector.bind(this)(options);
+        this.setMidiInputDevice(options[0].id);
     },
     onMIDIFailure: function() {
-        document.getElementById('midi_info').appendChild(document.createTextNode("Midi error: Cannot connect"));
         console.warn("Not recognising MIDI controller");
+        document.getElementById('midi_error').appendChild(
+            document.createTextNode("Midi error: Cannot connect")
+        );
+    },
+    makeMidiSelector: function(options) {
+        const s = document.createElement('select');
+        for (i in options) {
+            var o = document.createElement('option');
+            o.setAttribute("value", options[i].id);
+            o.appendChild(document.createTextNode(options[i].name));
+            s.appendChild(o);
+        }
+
+        document.getElementById('midi_select').appendChild(s);
+
+        // When user selects an input, bind the onmidimessage to that one
+        s.addEventListener('input', function (event) {
+            MidiKernel.onSelectUpdate.bind(MidiKernel)(event.target);
+        }, false);
+    },
+    onSelectUpdate: function(option) {
+        // Bind the onmidimessage to the chosen midi input
+        this.setMidiInputDevice(option.value);
+    },
+    setMidiInputDevice: function(id) {
+        var allInputs = this.midi.inputs.values();
+        for (var input = allInputs.next(); input && !input.done; input = allInputs.next()) {
+            if (input.value.id == id) {
+                input.value.onmidimessage = this.onMidiMessageEvent.bind(this.bindObject);
+            } else {
+                input.value.onmidimessage = null;
+            }
+        }
+    },
+    midiMessageOn: function() {
+        document.getElementById("midi_mon").classList.add("active");
+    },
+    midiMessageOff: function() {
+        document.getElementById("midi_mon").classList.remove("active");
     }
 }
 
