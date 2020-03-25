@@ -359,10 +359,11 @@ var MidiKernel = {
         // Start talking to MIDI controller
         if (navigator.requestMIDIAccess) {
             navigator.requestMIDIAccess({
-                sysex: true
+                sysex: false
             }).then(MidiKernel.onMIDISuccess.bind(MidiKernel), MidiKernel.onMIDIFailure.bind(MidiKernel));
         } else {
             console.warn("No MIDI support in your browser");
+            this.setMidiErrorMessage("No MIDI support in your browser.");
         }
     },
     onMIDISuccess: function(midiData) {
