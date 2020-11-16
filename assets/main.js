@@ -1,6 +1,7 @@
 window.onload = function(e) {
     Game.init();
     MidiKernel.init(Game.onMidiMessage, Game);
+    KeyboardKernel.init(Game.onKeyboard, Game);
 };
 
 String.prototype.isOneOf = function(items) {
@@ -46,68 +47,68 @@ const KeyAccMap = [
 ];
 
 const Notes = [
-    {note_number: 45, pos: ['a', '', 2], keys: Keydefs.a, tags: ["l2"], clefs: ["bass"]},
-    {note_number: 46, pos: ['a', '#', 2], keys: Keydefs.ais, tags: ["hard"], clefs: ["bass"]},
-    {note_number: 46, pos: ['b', 'b', 2], keys: Keydefs.bes, tags: ["hard"], clefs: ["bass"]},
-    {note_number: 47, pos: ['b', '', 2], keys: Keydefs.b, tags: ["l2"], clefs: ["bass"]},
-    {note_number: 47, pos: ['c', 'b', 3], keys: Keydefs.ces, tags: ["hard"], clefs: ["bass"]},
-    {note_number: 48, pos: ['c', '', 3], keys: Keydefs.c, tags: ["l2"], clefs: ["bass"]},
-    {note_number: 49, pos: ['c', '#', 3], keys: Keydefs.cis, tags: ["hard"], clefs: ["bass"]},
-    {note_number: 49, pos: ['d', 'b', 3], keys: Keydefs.des, tags: ["hard"], clefs: ["bass"]},
-    {note_number: 50, pos: ['d', '', 3], keys: Keydefs.d, tags: ["l2"], clefs: ["bass"]},
-    {note_number: 51, pos: ['d', '#', 3], keys: Keydefs.dis, tags: ["hard"], clefs: ["bass"]},
-    {note_number: 51, pos: ['e', 'b', 3], keys: Keydefs.ees, tags: ["hard"], clefs: ["bass"]},
-    {note_number: 52, pos: ['e', '', 3], keys: Keydefs.e, tags: ["l2"], clefs: ["bass"]},
-    {note_number: 53, pos: ['e', '#', 3], keys: Keydefs.eis, tags: ["hard"], clefs: ["bass"]},
-    {note_number: 53, pos: ['f', '', 3], keys: Keydefs.f, tags: ["l2"], clefs: ["bass"]},
-    {note_number: 54, pos: ['f', '#', 3], keys: Keydefs.fis, tags: ["hard"], clefs: ["bass"]},
-    {note_number: 54, pos: ['g', 'b', 3], keys: Keydefs.ges, tags: ["hard"], clefs: ["bass"]},
-    {note_number: 55, pos: ['g', '', 3], keys: Keydefs.g, tags: ["l2"], clefs: ["bass"]},
-    {note_number: 56, pos: ['g', '#', 3], keys: Keydefs.gis, tags: ["hard"], clefs: ["bass"]},
-    {note_number: 56, pos: ['a', 'b', 3], keys: Keydefs.aes, tags: ["hard"], clefs: ["bass"]},
-    {note_number: 57, pos: ['a', '', 3], keys: Keydefs.a, tags: ["l1", "l2"], clefs: ["bass", "treble"]},
-    {note_number: 58, pos: ['a', '#', 3], keys: Keydefs.ais, tags: ["hard"], clefs: ["bass", "treble"]},
-    {note_number: 58, pos: ['b', 'b', 3], keys: Keydefs.bes, tags: ["hard"], clefs: ["bass", "treble"]},
-    {note_number: 59, pos: ['b', '', 3], keys: Keydefs.b, tags: ["l2"], clefs: ["bass", "treble"]},
-    {note_number: 59, pos: ['c', 'b', 4], keys: Keydefs.ces, tags: ["hard"], clefs: ["bass", "treble"]},
-    {note_number: 60, pos: ['c', '', 4], keys: Keydefs.c, tags: ["l1", "l2"], clefs: ["bass", "treble"]},
-    {note_number: 61, pos: ['c', '#', 4], keys: Keydefs.cis, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 61, pos: ['d', 'b', 4], keys: Keydefs.des, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 62, pos: ['d', '', 4], keys: Keydefs.d, tags: ["l1"], clefs: ["treble"]},
-    {note_number: 63, pos: ['d', '#', 4], keys: Keydefs.dis, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 63, pos: ['e', 'b', 4], keys: Keydefs.ees, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 64, pos: ['e', '', 4], keys: Keydefs.e, tags: ["l1"], clefs: ["treble"]},
-    {note_number: 65, pos: ['e', '#', 4], keys: Keydefs.eis, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 65, pos: ['f', '', 4], keys: Keydefs.f, tags: ["l1"], clefs: ["treble"]},
-    {note_number: 66, pos: ['f', '#', 4], keys: Keydefs.fis, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 66, pos: ['g', 'b', 4], keys: Keydefs.ges, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 67, pos: ['g', '', 4], keys: Keydefs.g, tags: ["l1"], clefs: ["treble"]},
-    {note_number: 68, pos: ['g', '#', 4], keys: Keydefs.gis, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 68, pos: ['a', 'b', 4], keys: Keydefs.aes, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 69, pos: ['a', '', 4], keys: Keydefs.a, tags: ["l1"], clefs: ["treble"]},
-    {note_number: 70, pos: ['a', '#', 4], keys: Keydefs.ais, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 70, pos: ['b', 'b', 4], keys: Keydefs.bes, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 71, pos: ['b', '', 4], keys: Keydefs.b, tags: ["l1"], clefs: ["treble"]},
-    {note_number: 71, pos: ['c', 'b', 5], keys: Keydefs.ces, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 72, pos: ['c', '', 5], keys: Keydefs.c, tags: ["l1"], clefs: ["treble"]},
-    {note_number: 73, pos: ['c', '#', 5], keys: Keydefs.cis, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 73, pos: ['d', 'b', 5], keys: Keydefs.des, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 74, pos: ['d', '', 5], keys: Keydefs.d, tags: ["medium"], clefs: ["treble"]},
-    {note_number: 75, pos: ['d', '#', 5], keys: Keydefs.dis, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 75, pos: ['e', 'b', 5], keys: Keydefs.ees, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 76, pos: ['e', '', 5], keys: Keydefs.e, tags: ["medium"], clefs: ["treble"]},
-    {note_number: 77, pos: ['e', '#', 5], keys: Keydefs.eis, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 77, pos: ['f', '', 5], keys: Keydefs.f, tags: ["medium"], clefs: ["treble"]},
-    {note_number: 78, pos: ['f', '#', 5], keys: Keydefs.fis, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 78, pos: ['g', 'b', 5], keys: Keydefs.ges, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 79, pos: ['g', '', 5], keys: Keydefs.g, tags: ["medium"], clefs: ["treble"]},
-    {note_number: 80, pos: ['g', '#', 5], keys: Keydefs.gis, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 80, pos: ['a', 'b', 5], keys: Keydefs.aes, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 81, pos: ['a', '', 5], keys: Keydefs.a, tags: ["medium"], clefs: ["treble"]},
-    {note_number: 82, pos: ['a', '#', 5], keys: Keydefs.ais, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 82, pos: ['b', 'b', 5], keys: Keydefs.bes, tags: ["hard"], clefs: ["treble"]},
-    {note_number: 83, pos: ['b', '', 5], keys: Keydefs.b, tags: ["medium"], clefs: ["treble"]},
-    {note_number: 83, pos: ['c', 'b', 6], keys: Keydefs.ces, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 45, octave: 1, pos: ['a', '', 2], keys: Keydefs.a, tags: ["l2"], clefs: ["bass"]},
+    {note_number: 46, octave: 1, pos: ['a', '#', 2], keys: Keydefs.ais, tags: ["hard"], clefs: ["bass"]},
+    {note_number: 46, octave: 1, pos: ['b', 'b', 2], keys: Keydefs.bes, tags: ["hard"], clefs: ["bass"]},
+    {note_number: 47, octave: 1, pos: ['b', '', 2], keys: Keydefs.b, tags: ["l2"], clefs: ["bass"]},
+    {note_number: 47, octave: 1, pos: ['c', 'b', 3], keys: Keydefs.ces, tags: ["hard"], clefs: ["bass"]},
+    {note_number: 48, octave: 2, pos: ['c', '', 3], keys: Keydefs.c, tags: ["l2"], clefs: ["bass"]},
+    {note_number: 49, octave: 2, pos: ['c', '#', 3], keys: Keydefs.cis, tags: ["hard"], clefs: ["bass"]},
+    {note_number: 49, octave: 2, pos: ['d', 'b', 3], keys: Keydefs.des, tags: ["hard"], clefs: ["bass"]},
+    {note_number: 50, octave: 2, pos: ['d', '', 3], keys: Keydefs.d, tags: ["l2"], clefs: ["bass"]},
+    {note_number: 51, octave: 2, pos: ['d', '#', 3], keys: Keydefs.dis, tags: ["hard"], clefs: ["bass"]},
+    {note_number: 51, octave: 2, pos: ['e', 'b', 3], keys: Keydefs.ees, tags: ["hard"], clefs: ["bass"]},
+    {note_number: 52, octave: 2, pos: ['e', '', 3], keys: Keydefs.e, tags: ["l2"], clefs: ["bass"]},
+    {note_number: 53, octave: 2, pos: ['e', '#', 3], keys: Keydefs.eis, tags: ["hard"], clefs: ["bass"]},
+    {note_number: 53, octave: 2, pos: ['f', '', 3], keys: Keydefs.f, tags: ["l2"], clefs: ["bass"]},
+    {note_number: 54, octave: 2, pos: ['f', '#', 3], keys: Keydefs.fis, tags: ["hard"], clefs: ["bass"]},
+    {note_number: 54, octave: 2, pos: ['g', 'b', 3], keys: Keydefs.ges, tags: ["hard"], clefs: ["bass"]},
+    {note_number: 55, octave: 2, pos: ['g', '', 3], keys: Keydefs.g, tags: ["l2"], clefs: ["bass"]},
+    {note_number: 56, octave: 2, pos: ['g', '#', 3], keys: Keydefs.gis, tags: ["hard"], clefs: ["bass"]},
+    {note_number: 56, octave: 2, pos: ['a', 'b', 3], keys: Keydefs.aes, tags: ["hard"], clefs: ["bass"]},
+    {note_number: 57, octave: 2, pos: ['a', '', 3], keys: Keydefs.a, tags: ["l1", "l2"], clefs: ["bass", "treble"]},
+    {note_number: 58, octave: 2, pos: ['a', '#', 3], keys: Keydefs.ais, tags: ["hard"], clefs: ["bass", "treble"]},
+    {note_number: 58, octave: 2, pos: ['b', 'b', 3], keys: Keydefs.bes, tags: ["hard"], clefs: ["bass", "treble"]},
+    {note_number: 59, octave: 2, pos: ['b', '', 3], keys: Keydefs.b, tags: ["l2"], clefs: ["bass", "treble"]},
+    {note_number: 59, octave: 2, pos: ['c', 'b', 4], keys: Keydefs.ces, tags: ["hard"], clefs: ["bass", "treble"]},
+    {note_number: 60, octave: 3, pos: ['c', '', 4], keys: Keydefs.c, tags: ["l1", "l2"], clefs: ["bass", "treble"]},
+    {note_number: 61, octave: 3, pos: ['c', '#', 4], keys: Keydefs.cis, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 61, octave: 3, pos: ['d', 'b', 4], keys: Keydefs.des, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 62, octave: 3, pos: ['d', '', 4], keys: Keydefs.d, tags: ["l1"], clefs: ["treble"]},
+    {note_number: 63, octave: 3, pos: ['d', '#', 4], keys: Keydefs.dis, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 63, octave: 3, pos: ['e', 'b', 4], keys: Keydefs.ees, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 64, octave: 3, pos: ['e', '', 4], keys: Keydefs.e, tags: ["l1"], clefs: ["treble"]},
+    {note_number: 65, octave: 3, pos: ['e', '#', 4], keys: Keydefs.eis, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 65, octave: 3, pos: ['f', '', 4], keys: Keydefs.f, tags: ["l1"], clefs: ["treble"]},
+    {note_number: 66, octave: 3, pos: ['f', '#', 4], keys: Keydefs.fis, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 66, octave: 3, pos: ['g', 'b', 4], keys: Keydefs.ges, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 67, octave: 3, pos: ['g', '', 4], keys: Keydefs.g, tags: ["l1"], clefs: ["treble"]},
+    {note_number: 68, octave: 3, pos: ['g', '#', 4], keys: Keydefs.gis, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 68, octave: 3, pos: ['a', 'b', 4], keys: Keydefs.aes, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 69, octave: 3, pos: ['a', '', 4], keys: Keydefs.a, tags: ["l1"], clefs: ["treble"]},
+    {note_number: 70, octave: 3, pos: ['a', '#', 4], keys: Keydefs.ais, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 70, octave: 3, pos: ['b', 'b', 4], keys: Keydefs.bes, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 71, octave: 3, pos: ['b', '', 4], keys: Keydefs.b, tags: ["l1"], clefs: ["treble"]},
+    {note_number: 71, octave: 3, pos: ['c', 'b', 5], keys: Keydefs.ces, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 72, octave: 4, pos: ['c', '', 5], keys: Keydefs.c, tags: ["l1"], clefs: ["treble"]},
+    {note_number: 73, octave: 4, pos: ['c', '#', 5], keys: Keydefs.cis, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 73, octave: 4, pos: ['d', 'b', 5], keys: Keydefs.des, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 74, octave: 4, pos: ['d', '', 5], keys: Keydefs.d, tags: ["medium"], clefs: ["treble"]},
+    {note_number: 75, octave: 4, pos: ['d', '#', 5], keys: Keydefs.dis, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 75, octave: 4, pos: ['e', 'b', 5], keys: Keydefs.ees, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 76, octave: 4, pos: ['e', '', 5], keys: Keydefs.e, tags: ["medium"], clefs: ["treble"]},
+    {note_number: 77, octave: 4, pos: ['e', '#', 5], keys: Keydefs.eis, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 77, octave: 4, pos: ['f', '', 5], keys: Keydefs.f, tags: ["medium"], clefs: ["treble"]},
+    {note_number: 78, octave: 4, pos: ['f', '#', 5], keys: Keydefs.fis, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 78, octave: 4, pos: ['g', 'b', 5], keys: Keydefs.ges, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 79, octave: 4, pos: ['g', '', 5], keys: Keydefs.g, tags: ["medium"], clefs: ["treble"]},
+    {note_number: 80, octave: 4, pos: ['g', '#', 5], keys: Keydefs.gis, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 80, octave: 4, pos: ['a', 'b', 5], keys: Keydefs.aes, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 81, octave: 4, pos: ['a', '', 5], keys: Keydefs.a, tags: ["medium"], clefs: ["treble"]},
+    {note_number: 82, octave: 4, pos: ['a', '#', 5], keys: Keydefs.ais, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 82, octave: 4, pos: ['b', 'b', 5], keys: Keydefs.bes, tags: ["hard"], clefs: ["treble"]},
+    {note_number: 83, octave: 4, pos: ['b', '', 5], keys: Keydefs.b, tags: ["medium"], clefs: ["treble"]},
+    {note_number: 83, octave: 4, pos: ['c', 'b', 6], keys: Keydefs.ces, tags: ["hard"], clefs: ["treble"]},
 ];
 
 const Levels = [
@@ -184,6 +185,8 @@ var Game = {
 
         // Pick a random note to quiz
         this.active = this.levelNotes[Math.floor(Math.random() * this.levelNotes.length)];
+        // Set the keyboard to right octave for ease in playing note with keyboard
+        KeyboardKernel.setOctave(this.active.octave);
 
         // Draw the note
         noteData = this.active.pos;
@@ -228,6 +231,17 @@ var Game = {
             } else {
                 this.isIncorrect();
             }
+        }
+    },
+    onKeyboard: function(noteNumber) {
+        if (this.listening == false) {
+            return;
+        }
+
+        if (noteNumber == this.active.note_number) {
+            this.isCorrect();
+        } else {
+            this.isIncorrect();
         }
     },
     isCorrect: function() {
@@ -436,7 +450,33 @@ var MidiKernel = {
             }
         }
     }
-}
+};
+
+var KeyboardKernel = {
+    // a,w,s,e,d,f,g,y,h,u,j,i,k,o,l
+    keys: [65,87,83,69,68,70,84,71,89,72,85,74,73,75,79,76],
+    octave: 2,
+    noteBase: [24,36,48,60,72,84],
+    onMessageEvent: null,
+    bindObject: null, // Object to bind keyboard message subscriptions to
+    init: function(onMessageEvent, bindObject) {
+        KeyboardKernel.onMessageEvent = onMessageEvent;
+        KeyboardKernel.bindObject = bindObject;
+        document.onkeydown = function(e) {
+            if (KeyboardKernel.keys.includes(e.which)) {
+                noteNumber = KeyboardKernel.keyToNoteNumber(e.which);
+                KeyboardKernel.onMessageEvent.apply(KeyboardKernel.bindObject, [noteNumber]);
+            }
+        }
+    },
+    setOctave: function(octave) {
+        this.octave = octave;
+    },
+    keyToNoteNumber: function(keyNum) {
+        keyIndex = this.keys.indexOf(keyNum);
+        return this.noteBase[this.octave] + keyIndex;
+    }
+};
 
 var MusicCanvas = {
     context: null,
