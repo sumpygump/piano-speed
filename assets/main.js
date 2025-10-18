@@ -534,12 +534,12 @@ var MusicCanvas = {
 
         if (acc && !isInKey) {
             // If accidental, must force to add it this way
-            note.addAccidental(0, new VF.Accidental(acc));
+            note.addModifier(new VF.Accidental(acc));
         }
 
         if (forceNatural) {
             // If not in key force a natural
-            note.addAccidental(0, new VF.Accidental('n'));
+            note.addModifier(new VF.Accidental('n'));
         }
 
         tickContext.addTickable(note);
